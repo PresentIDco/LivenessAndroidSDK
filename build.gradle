@@ -1,0 +1,108 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
+
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0"
+
+//        multiDexEnabled true
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.2'
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled false
+            useProguard false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        release {
+            debuggable false
+            minifyEnabled true
+            useProguard true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets { main { java.srcDirs = ['src/main/java', 'src/main/java/com/gata/src'] }
+    }
+    repositories {
+        mavenCentral()
+    }
+}
+
+dependencies {
+//    api 'androidx.multidex:multidex:2.0.1'
+//    api 'androidx.test.ext:junit:1.1.2'
+//    api 'androidx.legacy:legacy-support-v4:1.0.0'
+//    implementation 'androidx.exifinterface:exifinterface:1.3.1'
+//    implementation 'com.android.support:appcompat-v7:29.0.0'
+//    api 'com.android.support:support-v13'
+
+    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'androidx.test.espresso:espresso-core:3.4.0'
+    implementation 'com.mikhaellopez:circularprogressbar:3.0.3'
+    implementation 'com.loopj.android:android-async-http:1.4.11'
+    implementation 'com.google.android.gms:play-services-auth:19.0.0'
+}
+
+task __deleteJar(type: Delete){
+    delete 'outjar/libGataSDK.jar'
+}
+
+task __AAR_Task(type: Copy) {
+    delete 'outjar/libGataSDK.aar'
+
+    dependsOn 'assembleRelease'
+
+    from('build/outputs/aar')
+    into('outjar')
+
+    include('gata-release.aar')
+    rename('gata-release.aar', 'libGataSDK.aar')
+}
+
+task __JAR_Task(type: Copy) {
+// Run createFullJarRelease from other
+    delete 'outjar/libGataSDK.jar'
+
+//    dependsOn 'createFullJarRelease'
+
+    from('build/intermediates/shrunk_jar/release')
+    into('outjar')
+
+    include('minified.jar')
+    rename('minified.jar', 'libGataSDK.jar')
+
+//    from('build/intermediates/compile_library_classes/release')
+//    into('outjar/')
+//    include('classes.jar')
+//    rename('classes.jar', 'libGataSDK.jar')
+}
+
+
+task ___deleteJar(type: Delete){
+    delete 'outjar/libGataSDK.jar'
+}
+
+task __DebugeJar(type: Copy) {
+    delete 'outjar/libGataSDK.jar'
+
+    from('build/intermediates/compile_library_classes_jar/debug')
+    into('outjar')
+
+    include('classes.jar')
+    rename('classes.jar', 'libGataSDK.jar')
+}
